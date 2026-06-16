@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -7,7 +6,7 @@ import { RuleManager } from '@/components/lexishift/rule-manager';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Copy, Repeat, Share2, SquareSlash, Trash2, CheckCircle2, RotateCcw } from 'lucide-react';
+import { Copy, Repeat, Share2, SquareSlash, Trash2, CheckCircle2, RotateCcw, ArrowRightLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 // Generates a default mapping for all letters: Shift +3, Output Uppercase
@@ -50,6 +49,7 @@ export default function LexiShiftPage() {
   }, [inputText, rules, mode]);
 
   const handleCopy = () => {
+    if (!outputText) return;
     navigator.clipboard.writeText(outputText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -61,6 +61,18 @@ export default function LexiShiftPage() {
 
   const toggleMode = () => {
     setMode(prev => prev === 'encrypt' ? 'decrypt' : 'encrypt');
+  };
+
+  const handleSwap = () => {
+    if (!outputText) return;
+    const currentOutput = outputText;
+    const currentInput = inputText;
+    setInputText(currentOutput);
+    setMode(prev => prev === 'encrypt' ? 'decrypt' : 'encrypt');
+    toast({
+      title: "Transmission Swapped",
+      description: "Output moved to source for processing.",
+    });
   };
 
   const clearInput = () => {
@@ -141,7 +153,6 @@ export default function LexiShiftPage() {
                   />
                   <div className="flex items-center gap-2 pt-2 text-xs text-muted-foreground font-mono">
                     <span className="px-1.5 py-0.5 rounded bg-muted/50 border border-border">{inputText.length} CHARS</span>
-                    <span className="px-1.5 py-0.5 rounded bg-muted/50 border border-border">{inputText.split(/\s+/).filter(Boolean).length} WORDS</span>
                   </div>
                 </div>
 
@@ -150,11 +161,11 @@ export default function LexiShiftPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold tracking-widest text-accent uppercase">Shifted Result</span>
                     <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={handleSwap} title="Move output to input" className="h-6 w-6 text-accent hover:bg-accent/10">
+                        <ArrowRightLeft className="w-3 h-3" />
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={handleCopy} className="h-6 w-6 text-accent">
                         {copied ? <CheckCircle2 className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-accent">
-                        <Share2 className="w-3 h-3" />
                       </Button>
                     </div>
                   </div>
@@ -173,26 +184,37 @@ export default function LexiShiftPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-secondary/20 border border-border/50">
             <div className="flex items-center gap-4">
                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-background/50 border border-border">
-                  <span className={`text-xs font-bold ${mode === 'encrypt' ? 'text-primary' : 'text-muted-foreground'}`}>ENCRYPT</span>
+                  <button 
+                    onClick={() => setMode('encrypt')}
+                    className={`text-xs font-bold transition-colors ${mode === 'encrypt' ? 'text-primary' : 'text-muted-foreground hover:text-primary/50'}`}
+                  >
+                    ENCRYPT
+                  </button>
                   <Button 
                     size="sm" 
                     variant="ghost" 
                     onClick={toggleMode}
                     className="h-8 w-12 rounded-full bg-muted/50 p-0 overflow-hidden relative"
                   >
-                    <div className={`absolute inset-0 bg-primary/20 transition-transform ${mode === 'encrypt' ? '-translate-x-full' : 'translate-x-full'}`} />
+                    <div className={`absolute inset-0 bg-primary/20 transition-transform duration-300 ${mode === 'encrypt' ? 'translate-x-0' : 'translate-x-0'}`} />
                     <Repeat className={`w-4 h-4 text-primary transition-transform duration-500 ${mode === 'decrypt' ? 'rotate-180' : ''}`} />
                   </Button>
-                  <span className={`text-xs font-bold ${mode === 'decrypt' ? 'text-primary' : 'text-muted-foreground'}`}>DECRYPT</span>
+                  <button 
+                    onClick={() => setMode('decrypt')}
+                    className={`text-xs font-bold transition-colors ${mode === 'decrypt' ? 'text-primary' : 'text-muted-foreground hover:text-primary/50'}`}
+                  >
+                    DECRYPT
+                  </button>
                </div>
                <div className="hidden md:block h-8 w-px bg-border" />
                <p className="text-xs text-muted-foreground hidden md:block font-mono">
-                 MODE: {mode.toUpperCase()}
+                 PROTOCOL: {mode === 'encrypt' ? 'SUBSTITUTION' : 'RECOVERY'}
                </p>
             </div>
             
-            <Button className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/80 font-bold px-8">
-              EXPORT PROTOCOL
+            <Button onClick={handleSwap} className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/80 font-bold px-8 gap-2">
+              <ArrowRightLeft className="w-4 h-4" />
+              SWAP FLOW
             </Button>
           </div>
         </div>
