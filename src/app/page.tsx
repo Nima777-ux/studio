@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -6,21 +7,21 @@ import { RuleManager } from '@/components/lexishift/rule-manager';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Copy, Repeat, Share2, SquareSlash, Trash2, CheckCircle2, RotateCcw, ArrowRightLeft } from 'lucide-react';
+import { Copy, Repeat, SquareSlash, Trash2, CheckCircle2, RotateCcw, ArrowRightLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Generates a default mapping for all letters: Shift +3, Output Uppercase
+// Generates a default mapping: Shift +3, preserving case (a->d, A->D)
 const generateDefaultRules = (): CipherRule[] => {
   const lowercase = "abcdefghijklmnopqrstuvwxyz";
   const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   
   const rules: CipherRule[] = [];
 
-  // Map lowercase to shifted uppercase
+  // Map lowercase to shifted lowercase
   for (let i = 0; i < lowercase.length; i++) {
     rules.push({
       original: lowercase[i],
-      replacement: uppercase[(i + 3) % 26]
+      replacement: lowercase[(i + 3) % 26]
     });
   }
 
@@ -66,7 +67,6 @@ export default function LexiShiftPage() {
   const handleSwap = () => {
     if (!outputText) return;
     const currentOutput = outputText;
-    const currentInput = inputText;
     setInputText(currentOutput);
     setMode(prev => prev === 'encrypt' ? 'decrypt' : 'encrypt');
     toast({
@@ -83,12 +83,16 @@ export default function LexiShiftPage() {
     setRules(generateDefaultRules());
     toast({
       title: "Protocol Reset",
-      description: "Default +3 Alphabet Shift has been restored.",
+      description: "Default Case-Preserving +3 Shift has been restored.",
     });
   };
 
   const clearRules = () => {
     setRules([]);
+    toast({
+      title: "Engine Purged",
+      description: "All substitution rules have been removed.",
+    });
   };
 
   return (
@@ -108,7 +112,7 @@ export default function LexiShiftPage() {
           LEXI<span className="text-primary italic">SHIFT</span>
         </h1>
         <p className="text-muted-foreground text-lg font-light tracking-wide max-w-lg mx-auto">
-          Professional environment for character substitution and synthetic language architecture.
+          Professional environment for character substitution and reversible encryption architecture.
         </p>
       </header>
 
@@ -146,7 +150,7 @@ export default function LexiShiftPage() {
                     </Button>
                   </div>
                   <Textarea
-                    placeholder="Enter raw frequency data..."
+                    placeholder="Enter text to process..."
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     className="min-h-[250px] bg-transparent border-none text-xl font-mono focus-visible:ring-0 placeholder:text-muted-foreground/30 resize-none"
@@ -161,7 +165,7 @@ export default function LexiShiftPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold tracking-widest text-accent uppercase">Shifted Result</span>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={handleSwap} title="Move output to input" className="h-6 w-6 text-accent hover:bg-accent/10">
+                      <Button variant="ghost" size="icon" onClick={handleSwap} title="Swap Flow (Output to Source)" className="h-6 w-6 text-accent hover:bg-accent/10">
                         <ArrowRightLeft className="w-3 h-3" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={handleCopy} className="h-6 w-6 text-accent">
@@ -196,7 +200,6 @@ export default function LexiShiftPage() {
                     onClick={toggleMode}
                     className="h-8 w-12 rounded-full bg-muted/50 p-0 overflow-hidden relative"
                   >
-                    <div className={`absolute inset-0 bg-primary/20 transition-transform duration-300 ${mode === 'encrypt' ? 'translate-x-0' : 'translate-x-0'}`} />
                     <Repeat className={`w-4 h-4 text-primary transition-transform duration-500 ${mode === 'decrypt' ? 'rotate-180' : ''}`} />
                   </Button>
                   <button 
@@ -208,13 +211,13 @@ export default function LexiShiftPage() {
                </div>
                <div className="hidden md:block h-8 w-px bg-border" />
                <p className="text-xs text-muted-foreground hidden md:block font-mono">
-                 PROTOCOL: {mode === 'encrypt' ? 'SUBSTITUTION' : 'RECOVERY'}
+                 MODE: {mode === 'encrypt' ? 'FORWARD SHIFT' : 'REVERSE RECOVERY'}
                </p>
             </div>
             
             <Button onClick={handleSwap} className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/80 font-bold px-8 gap-2">
               <ArrowRightLeft className="w-4 h-4" />
-              SWAP FLOW
+              SWAP TERMINALS
             </Button>
           </div>
         </div>
