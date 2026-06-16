@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from 'react';
@@ -6,16 +7,39 @@ import { RuleManager } from '@/components/lexishift/rule-manager';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Copy, Repeat, Share2, SquareSlash, Trash2, CheckCircle2 } from 'lucide-react';
+import { Copy, Repeat, Share2, SquareSlash, Trash2, CheckCircle2, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+// Generates a default mapping for all letters: Shift +3, Output Uppercase
+const generateDefaultRules = (): CipherRule[] => {
+  const lowercase = "abcdefghijklmnopqrstuvwxyz";
+  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  
+  const rules: CipherRule[] = [];
+
+  // Map lowercase to shifted uppercase
+  for (let i = 0; i < lowercase.length; i++) {
+    rules.push({
+      original: lowercase[i],
+      replacement: uppercase[(i + 3) % 26]
+    });
+  }
+
+  // Map uppercase to shifted uppercase
+  for (let i = 0; i < uppercase.length; i++) {
+    rules.push({
+      original: uppercase[i],
+      replacement: uppercase[(i + 3) % 26]
+    });
+  }
+
+  return rules;
+};
 
 export default function LexiShiftPage() {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
-  const [rules, setRules] = useState<CipherRule[]>([
-    { original: 'a', replacement: 'c' },
-    { original: 'eat', replacement: 'ouy' }
-  ]);
+  const [rules, setRules] = useState<CipherRule[]>(generateDefaultRules());
   const [mode, setMode] = useState<EncryptionMode>('encrypt');
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -43,6 +67,18 @@ export default function LexiShiftPage() {
     setInputText('');
   };
 
+  const resetRules = () => {
+    setRules(generateDefaultRules());
+    toast({
+      title: "Protocol Reset",
+      description: "Default +3 Alphabet Shift has been restored.",
+    });
+  };
+
+  const clearRules = () => {
+    setRules([]);
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col items-center py-12 px-4 md:px-8">
       {/* Decorative Elements */}
@@ -60,7 +96,7 @@ export default function LexiShiftPage() {
           LEXI<span className="text-primary italic">SHIFT</span>
         </h1>
         <p className="text-muted-foreground text-lg font-light tracking-wide max-w-lg mx-auto">
-          The professional environment for character substitution and synthetic language architecture.
+          Professional environment for character substitution and synthetic language architecture.
         </p>
       </header>
 
@@ -70,6 +106,17 @@ export default function LexiShiftPage() {
         {/* Left Column: Management */}
         <div className="lg:col-span-4 space-y-6">
           <RuleManager rules={rules} onRulesChange={setRules} />
+          
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={resetRules} className="flex-1 gap-2 border-primary/20 hover:bg-primary/10">
+              <RotateCcw className="w-3 h-3" />
+              Reset to Default
+            </Button>
+            <Button variant="outline" size="sm" onClick={clearRules} className="flex-1 gap-2 border-destructive/20 text-destructive hover:bg-destructive/10">
+              <Trash2 className="w-3 h-3" />
+              Clear All
+            </Button>
+          </div>
         </div>
 
         {/* Right Column: Interactive Engine */}
@@ -139,8 +186,8 @@ export default function LexiShiftPage() {
                   <span className={`text-xs font-bold ${mode === 'decrypt' ? 'text-primary' : 'text-muted-foreground'}`}>DECRYPT</span>
                </div>
                <div className="hidden md:block h-8 w-px bg-border" />
-               <p className="text-xs text-muted-foreground hidden md:block">
-                 Toggle between forward and reverse translation logic.
+               <p className="text-xs text-muted-foreground hidden md:block font-mono">
+                 MODE: {mode.toUpperCase()}
                </p>
             </div>
             
