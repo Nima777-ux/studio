@@ -17,7 +17,7 @@ const generateDefaultRules = (): CipherRule[] => {
   
   const rules: CipherRule[] = [];
 
-  // Map lowercase to shifted lowercase
+  // Map lowercase to shifted lowercase (a -> d)
   for (let i = 0; i < lowercase.length; i++) {
     rules.push({
       original: lowercase[i],
@@ -25,7 +25,7 @@ const generateDefaultRules = (): CipherRule[] => {
     });
   }
 
-  // Map uppercase to shifted uppercase
+  // Map uppercase to shifted uppercase (A -> D)
   for (let i = 0; i < uppercase.length; i++) {
     rules.push({
       original: uppercase[i],
@@ -68,10 +68,11 @@ export default function LexiShiftPage() {
     if (!outputText) return;
     const currentOutput = outputText;
     setInputText(currentOutput);
+    // Usually when swapping you want to reverse the mode to verify the original text
     setMode(prev => prev === 'encrypt' ? 'decrypt' : 'encrypt');
     toast({
       title: "Transmission Swapped",
-      description: "Output moved to source for processing.",
+      description: "Output moved to source for reverse processing.",
     });
   };
 
@@ -83,7 +84,7 @@ export default function LexiShiftPage() {
     setRules(generateDefaultRules());
     toast({
       title: "Protocol Reset",
-      description: "Default Case-Preserving +3 Shift has been restored.",
+      description: "Standard Case-Preserving +3 Shift restored.",
     });
   };
 
@@ -126,11 +127,11 @@ export default function LexiShiftPage() {
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={resetRules} className="flex-1 gap-2 border-primary/20 hover:bg-primary/10">
               <RotateCcw className="w-3 h-3" />
-              Reset to Default
+              Reset to +3 Shift
             </Button>
             <Button variant="outline" size="sm" onClick={clearRules} className="flex-1 gap-2 border-destructive/20 text-destructive hover:bg-destructive/10">
               <Trash2 className="w-3 h-3" />
-              Clear All
+              Clear Engine
             </Button>
           </div>
         </div>
@@ -165,7 +166,7 @@ export default function LexiShiftPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold tracking-widest text-accent uppercase">Shifted Result</span>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={handleSwap} title="Swap Flow (Output to Source)" className="h-6 w-6 text-accent hover:bg-accent/10">
+                      <Button variant="ghost" size="icon" onClick={handleSwap} title="Swap Terminals" className="h-6 w-6 text-accent hover:bg-accent/10">
                         <ArrowRightLeft className="w-3 h-3" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={handleCopy} className="h-6 w-6 text-accent">
@@ -224,7 +225,7 @@ export default function LexiShiftPage() {
       </main>
 
       <footer className="mt-20 py-8 border-t border-border/20 w-full max-w-6xl text-center space-y-4">
-        <p className="text-muted-foreground text-xs tracking-[0.3em]">LEXISHIFT v2.4.0 // END-TO-END SUBSTITUTION ENGINE</p>
+        <p className="text-muted-foreground text-xs tracking-[0.3em]">LEXISHIFT v2.5.0 // END-TO-END SUBSTITUTION ENGINE</p>
         <div className="flex justify-center gap-6 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
            <div className="h-4 w-4 rounded-full bg-primary" />
            <div className="h-4 w-4 rounded-full bg-secondary" />
