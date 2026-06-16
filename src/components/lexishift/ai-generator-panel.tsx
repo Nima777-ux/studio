@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Sparkles, Loader2, Zap } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { CipherRule } from '@/lib/encryption-utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface AIGeneratorPanelProps {
   onSchemeGenerated: (rules: CipherRule[]) => void;
@@ -18,6 +19,7 @@ export function AIGeneratorPanel({ onSchemeGenerated }: AIGeneratorPanelProps) {
   const [complexity, setComplexity] = useState<'simple' | 'medium' | 'complex'>('medium');
   const [isLoading, setIsLoading] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
+  const { toast } = useToast();
 
   const handleGenerate = async () => {
     if (!theme) return;
@@ -26,8 +28,17 @@ export function AIGeneratorPanel({ onSchemeGenerated }: AIGeneratorPanelProps) {
     try {
       const result = await generateThemeBasedEncryptionScheme({ theme, complexity });
       onSchemeGenerated(result.rules);
-    } catch (error) {
+      toast({
+        title: "Protocol Synthesized",
+        description: `Successfully generated ${result.rules.length} encryption rules based on "${theme}".`,
+      });
+    } catch (error: any) {
       console.error("AI Generation failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Synthesis Error",
+        description: error.message || "The AI architect failed to construct the scheme. Check your connection or API configuration.",
+      });
     } finally {
       setIsLoading(false);
       setTimeout(() => setIsGlitching(false), 800);
