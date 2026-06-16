@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { CipherRule, applyCipher, EncryptionMode } from '@/lib/encryption-utils';
 import { RuleManager } from '@/components/lexishift/rule-manager';
-import { AIGeneratorPanel } from '@/components/lexishift/ai-generator-panel';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -68,9 +67,8 @@ export default function LexiShiftPage() {
       {/* Main Grid Content */}
       <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
         
-        {/* Left Column: Management & AI */}
+        {/* Left Column: Management */}
         <div className="lg:col-span-4 space-y-6">
-          <AIGeneratorPanel onSchemeGenerated={setRules} />
           <RuleManager rules={rules} onRulesChange={setRules} />
         </div>
 
